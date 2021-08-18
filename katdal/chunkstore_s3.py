@@ -529,9 +529,9 @@ class S3ChunkStore(ChunkStore):
                     # Raise the appropriate exception
                     if status == 401:
                         raise AuthorisationFailed(msg)
-                    elif status in (403, 404):
-                        # Ceph RGW returns 403 for missing keys due to our bucket policy
-                        # (see https://tracker.ceph.com/issues/38638 for discussion)
+                    elif status == 403:
+                        raise StoreUnavailable(msg)
+                    elif status in 404:
                         raise S3ObjectNotFound(msg)
                     elif self._retries.is_retry(method, status):
                         raise S3ServerGlitch(msg, status)
